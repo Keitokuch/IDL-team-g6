@@ -1,3 +1,7 @@
+import torch
+import torch.nn.utils.rnn as rnn
+import numpy as np
+
 class KnnwAudioDataset(torch.utils.data.Dataset):
     def __init__(self, 
                  audio_data,
@@ -43,11 +47,11 @@ def collate(data):
         X, Y = zip(*data)
         y_lens = torch.tensor(list(map(len, Y)))
         x_lens = torch.tensor(list(map(len, X)))
-        X = rnn_utils.pad_sequence(X, batch_first=True)
-        Y = rnn_utils.pad_sequence(Y, batch_first=True)
+        X = rnn.pad_sequence(X, batch_first=True)
+        Y = rnn.pad_sequence(Y, batch_first=True)
         return X, Y, x_lens, y_lens
     else:
         X = data
         x_lens = torch.tensor(list(map(len, X)))
-        X = rnn_utils.pad_sequence(X, batch_first=True)
+        X = rnn.pad_sequence(X, batch_first=True)
         return X, x_lens
