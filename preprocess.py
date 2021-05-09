@@ -49,14 +49,14 @@ def preprocess(sub_df):
     sub_df['Processed Text'] = sub_df['Text'].apply(preprocess_line)
     # Keep only valid lines
     processed_df = sub_df[(sub_df['Processed Text'] != '') & (sub_df['Speaker Label'] != 'None')].copy()
-    print(len(sub_df), '->', len(processed_df))
+    print("Number of lines:", len(sub_df), '->', len(processed_df))
     processed_df['Transcript Indices'] = processed_df['Processed Text'].apply(transcript_to_index)
     return processed_df
 
 
 # Check letter list after proc
-def get_letter_vocab(df, row_name='Processed Text'):
+def get_letter_vocab(series):
     letters = set()
-    for line in df[row_name]:
+    for line in series:
         letters |= set(line)
     return letters
