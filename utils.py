@@ -1,6 +1,26 @@
 import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from constant import LETTER_LIST
+
+
+def plot_attention(attention):
+    plt.clf()
+    sns.heatmap(attention, cmap='GnBu')
+    plt.show()
+
+
+# Index conversion
+letter2index = { l : i for i, l in enumerate(LETTER_LIST)}
+index2letter = { i : l for i, l in enumerate(LETTER_LIST)}
+
 
 # Decode Utilities
+def transcript_to_index(line):
+    idxs = [letter2index[l] for l in line]
+    idxs.append(letter2index['<eos>'])
+    return idxs
+
 def index_to_transcript(indices):
     letters = [index2letter[idx] for idx in indices]
     try:

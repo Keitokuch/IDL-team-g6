@@ -1,8 +1,7 @@
 import re
 from num2words import num2words
+from utils import transcript_to_index
 
-LETTER_LIST = ['<sos>', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', \
-         'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '-', "'", '.', '_', '+', ' ', '<eos>']
 
 # Letter substitution
 substitute_from = 'é:'
@@ -34,16 +33,6 @@ def preprocess_line(line):
     line = space_pattern.sub(" ", line)
     line = line.lower().strip()
     return line
-
-# Index conversion
-letter2index = { l : i for i, l in enumerate(LETTER_LIST)}
-index2letter = { i : l for i, l in enumerate(LETTER_LIST)}
-
-
-def transcript_to_index(line):
-    idxs = [letter2index[l] for l in line]
-    idxs.append(letter2index['<eos>'])
-    return idxs
 
 
 def preprocess(sub_df):
