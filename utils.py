@@ -1,3 +1,4 @@
+import numpy as np
 
 # Decode Utilities
 def index_to_transcript(indices):
