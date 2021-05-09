@@ -44,16 +44,6 @@ def transcript_to_index(line):
     return idxs
 
 
-def index_to_transcript(indices):
-    letters = [index2letter[idx] for idx in indices]
-    try:
-        ed = letters.index('<eos>')
-    except ValueError:
-        ed = len(letters)
-    letters = letters[:ed]
-    return ''.join(letters)
-
-
 def preprocess(sub_df):
     #  Process text
     sub_df['Processed Text'] = sub_df['Text'].apply(preprocess_line)
