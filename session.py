@@ -124,7 +124,7 @@ class Session():
         self.optim_factory = optim_factory
         self.optim = optim_factory(model)
         if self.lr_sched:
-            self.lr_sched.set_optim(self.optim)
+            self.lr_sched = self.sched_factory(self)
         return self
 
     def set_lr_sched(self, sched_factory):
@@ -144,19 +144,3 @@ class Session():
         from shutil import copytree
         copytree(self.name, name)
         self.name = name
-
-
-class LRSched_0arg:
-    def __init__(self, factory):
-        self.factory = factory
-
-    def __call__(self, optim):
-        self.optim = optim
-        self.sched = self.factory(optim)
-        return self
-
-    def step(self, epoch, acc, loss):
-        self.sched.step()
-    
-    def set_optim(self, optim):
-        return self.__call__(optim)
