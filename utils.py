@@ -21,6 +21,7 @@ def transcript_to_index(line):
     idxs.append(letter2index['<eos>'])
     return idxs
 
+
 def index_to_transcript(indices):
     letters = [index2letter[idx] for idx in indices]
     try:
