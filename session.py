@@ -56,7 +56,7 @@ class Session():
             self.set_lr(lr)
         use_sched = True if self.lr_sched is not None and not disable_sched else False
         if use_sched:
-            self.lr_sched = self.sched_factory(self)
+            self.lr_sched = self.sched_factory(self.optim)
         end_epoch = self.epoch + num_epochs
         for i in range(num_epochs):
             self.epoch += 1
@@ -79,7 +79,7 @@ class Session():
         self.model = self.model_factory()
         self.optim = self.optim_factory(self.model)
         if self.sched_factory:
-            self.lr_sched = self.sched_factory(self)
+            self.lr_sched = self.sched_factory(self.optim)
         else:
             self.lr_sched = None
         self.scaler = torch.cuda.amp.GradScaler(enabled=self.use_amp)
@@ -101,6 +101,8 @@ class Session():
         }
         if self.use_amp:
             ckpt['scaler'] = self.scaler.state_dict()
+        if self.lr_sched:
+            ckpt['lr_sched'] = self.lr_sched.state_dict()
         ckpt.update(self.get_checkpoint())
         torch.save(ckpt, ckpt_path)
         last = os.path.join(name, "last")
@@ -119,6 +121,8 @@ class Session():
             self.scaler.load_state_dict(ckpt['scaler'])
         if 'epoch' in ckpt:
             self.epoch = ckpt['epoch']
+        if 'lr_sched' in ckpt and self.lr_sched:
+            self.lr_sched.load_state_dict(ckpt['lr_sched'])
         self.put_checkpoint(ckpt)
         print("Loaded checkpoint", ckpt_path)
         return self
@@ -127,12 +131,12 @@ class Session():
         self.optim_factory = optim_factory
         self.optim = optim_factory(model)
         if self.lr_sched:
-            self.lr_sched = self.sched_factory(self)
+            self.lr_sched = self.sched_factory(self.optim)
         return self
 
     def set_lr_sched(self, sched_factory):
         self.sched_factory = sched_factory
-        self.lr_sched = sched_factory(self)
+        self.lr_sched = sched_factory(self.optim)
         return self
 
     def set_lr(self, lr):

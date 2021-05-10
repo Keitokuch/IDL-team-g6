@@ -29,6 +29,12 @@ class LRSched_0arg:
     def step(self, epoch, acc, loss):
         self.sched.step()
 
+    def state_dict(self):
+        return self.sched.state_dict()
+
+    def load_state_dict(self, state_dict):
+        self.sched.load_state_dict(state_dict)
+
 
 #  LAS training session
 class LASSession(Session):
