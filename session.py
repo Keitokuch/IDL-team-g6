@@ -55,8 +55,6 @@ class Session():
         if lr:
             self.set_lr(lr)
         use_sched = True if self.lr_sched is not None and not disable_sched else False
-        if use_sched:
-            self.lr_sched = self.sched_factory(self.optim)
         end_epoch = self.epoch + num_epochs
         for i in range(num_epochs):
             self.epoch += 1
