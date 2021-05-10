@@ -6,6 +6,8 @@ from tqdm.notebook import tqdm
 from torch.cuda.amp import autocast
 from utils import *
 
+from __main__ import device
+
 
 # tf and af scheduling function
 def thred_sched(e, thred, delta, init=0.9, minval=0.6):

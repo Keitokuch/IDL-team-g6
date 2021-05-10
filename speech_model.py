@@ -3,6 +3,8 @@ import torch.nn as nn
 import torch.nn.utils.rnn as rnn
 from constant import LETTER_LIST
 
+from __main__ import device
+
 
 class LockedDropoutCell(nn.Module):
     def __init__(self, p=0.5):

@@ -74,7 +74,7 @@ class Session():
 
     def init_session(self):
         self.epoch = 0
-        self.model = self.model_factory().to(device)
+        self.model = self.model_factory()
         self.optim = self.optim_factory(self.model)
         if self.sched_factory:
             self.lr_sched = self.sched_factory(self.optim)
