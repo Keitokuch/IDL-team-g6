@@ -35,9 +35,11 @@ def preprocess_line(line):
     return line
 
 
-def preprocess(sub_df):
+def preprocess(sub_df, remove_music=False):
     #  Process text
     sub_df['Processed Text'] = sub_df['Text'].apply(preprocess_line)
+    if remove_music:
+        sub_df = sub_df[sub_df["Speaker Label"] != "Band"] 
     # Keep only valid lines
     processed_df = sub_df[(sub_df['Processed Text'] != '') & (sub_df['Speaker Label'] != 'None')].copy()
     print("Number of lines:", len(sub_df), '->', len(processed_df))
