@@ -36,6 +36,31 @@ class LRSched_0arg:
         self.sched.load_state_dict(state_dict)
 
 
+class PlateauSched:
+    def __init__(self, optim, mode='acc', **kwargs):
+        self.optim = optim
+        if mode == 'acc':
+            self.mode = 'acc'
+            self.mode_ = 'max'
+        else:
+            self.mode = 'loss'
+            self.mode_ = 'min'
+        self.kwargs = kwargs
+        self.sched = torch.optim.lr_scheduler.ReduceLROnPlateau(optim, self.mode_, **kwargs)
+
+    def step(self, epoch, acc, loss):
+        val = loss
+        if self.mode == 'acc':
+            val = acc
+        self.sched.step(val)
+
+    def state_dict(self):
+        return self.sched.state_dict()
+
+    def load_state_dict(self, state_dict):
+        self.sched.load_state_dict(state_dict)
+
+
 #  LAS training session
 class LASSession(Session):
     def init(self, tf_sched=None, af_sched=None, **kwargs):
@@ -171,3 +196,111 @@ class LASSession(Session):
         plt.ylabel('Levenshtein Distance')
         plt.legend()
         plt.show()
+
+
+class SpeakerRecSession(Session):
+    def init(self, **kwargs):
+        self.train_loss_history = {}
+        self.val_loss_history = {}
+        self.train_acc_history = {}
+        self.val_acc_history = {}
+
+    def get_checkpoint(self):
+        return {"train_loss_history": self.train_loss_history,
+                "val_loss_history": self.val_loss_history,
+                "train_acc_history": self.train_acc_history,
+                "val_acc_history": self.val_acc_history,
+                }
+
+    def put_checkpoint(self, ckpt_dict):
+        self.train_loss_history = ckpt_dict.get('train_loss_history', {})
+        self.val_loss_history = ckpt_dict.get('val_loss_history', {})
+        self.train_acc_history = ckpt_dict.get('train_acc_history', {})
+        self.val_acc_history = ckpt_dict.get('val_acc_history', {})
+    
+    def run_epoch(self, epoch, end_epoch):
+        print(f'\nEpoch {epoch}/{end_epoch}')
+        train_acc, train_loss = self.train_model(prompt=f"Epoch {self.epoch}/{end_epoch}")
+        self.train_loss_history[epoch] = train_loss
+        self.train_acc_history[epoch] = train_acc
+        print(f'Train Acc: {train_acc:.2f} Train Loss: {train_loss:.2f}')
+        val_acc, val_loss = self.eval_model()
+        self.val_acc_history[self.epoch] = val_acc
+        self.val_loss_history[self.epoch] = val_loss
+        print(f'Val Acc: {val_acc:.2f} Val Loss: {val_loss:.2f}')
+        return val_acc, val_loss
+
+    
+    def train_model(self, data=None, criterion=None, prompt=None):
+        data = data or self.train_data
+        optimizer = self.optim
+        criterion = criterion or self.criterion
+        total_loss = 0.0
+        total_correct = 0.0
+        self.model.train()
+        t = tqdm(data)
+        if prompt: t.set_description(prompt)
+        for x, x_lens, y in t:
+            x, y = x.to(device), y.to(device)
+            optimizer.zero_grad()
+            with autocast(self.use_amp):
+                predictions = self.model(x, x_lens)
+                loss = criterion(predictions, y)
+            self.scaler.scale(loss).backward()
+            self.scaler.step(optimizer)
+            self.scaler.update()
+            total_loss += loss.item()
+            total_correct += (torch.argmax(predictions, 1) == y).sum()
+            t.set_postfix({"loss": f"{loss.item():.2f}"})
+            del x, y, predictions
+        avg_loss = total_loss / len(data)
+        acc = total_correct / len(data.dataset)
+        torch.cuda.empty_cache()
+        return acc, avg_loss
+
+    def eval_model(self, data=None, criterion=None):
+        data = data or self.val_data
+        criterion = criterion or self.criterion
+        self.model.eval()
+        total_loss = 0.0
+        total_correct = 0
+        for x, x_lens, y in data:
+            x, y = x.to(device), y.to(device)
+            with autocast(self.use_amp):
+                predictions = self.model(x, x_lens)
+                loss = criterion(predictions, y)
+            total_loss += loss.item()
+            total_correct += (torch.argmax(predictions, 1) == y).sum()
+            del x, y, predictions
+        avg_loss = total_loss / len(data)
+        acc = total_correct / len(data.dataset)
+        torch.cuda.empty_cache()
+        return acc, avg_loss
+
+    def plot_loss(self, fname=None, format=None):
+        train = [self.train_loss_history.get(e, None) for e in range(1, self.epoch)]
+        test = [self.val_loss_history.get(e, None) for e in range(1, self.epoch)]
+        plt.plot(train, label='train')
+        plt.plot(test, label='test')
+        plt.title("Speaker Identification Cross-Entropy Loss")
+        plt.xlabel("Epoch")
+        plt.ylabel("Cross-Entropy Loss")
+        plt.legend()
+        if fname:
+            plt.savefig(fname, format=format)
+        else:
+            plt.show()
+    
+    def plot_acc(self, fname=None, format=None):
+        train = [self.train_acc_history.get(e, None) for e in range(1, self.epoch)]
+        test = [self.val_acc_history.get(e, None) for e in range(1, self.epoch)]
+        plt.plot(train, label='train')
+        plt.plot(test, label='test')
+        plt.ylabel("Classification Accuracy")
+        plt.xlabel("Epoch")
+        plt.title("Speaker Identification Accuracy")
+        plt.legend()
+        if fname:
+            plt.savefig(fname, format=format)
+        else:
+            plt.show()
