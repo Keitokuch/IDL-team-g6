@@ -24,6 +24,7 @@ action_pattern = re.compile(r"\[.*\]")      # Remove action description like [ga
 description_pattern = re.compile(r"\(.*\)") # Remove descriptive notes like (20:30)
 number_pattern = re.compile(r"[0-9]+")      # Convert number to English words
 
+
 def preprocess_line(line):
     line = label_pattern.sub("", line.strip())
     line = action_pattern.sub("", line)
