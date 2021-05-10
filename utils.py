@@ -1,6 +1,8 @@
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+import librosa
+import librosa.display
 from constant import LETTER_LIST
 
 
@@ -9,6 +11,11 @@ def plot_attention(attention):
     sns.heatmap(attention, cmap='GnBu')
     plt.show()
 
+def plot_spectrogram(spec, trans_str=""):
+    fig, ax = plt.subplots()
+    ax.set(title=trans_str)
+    img = librosa.display.specshow(spec.T, ax=ax)
+    fig.colorbar(img, ax=ax)
 
 # Index conversion
 letter2index = { l : i for i, l in enumerate(LETTER_LIST)}
