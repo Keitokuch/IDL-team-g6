@@ -12,10 +12,10 @@ def plot_attention(attention):
     plt.show()
 
 def plot_spectrogram(spec, trans_str=""):
-    fig, ax = plt.subplots()
-    ax.set(title=trans_str)
-    img = librosa.display.specshow(spec.T, ax=ax)
-    fig.colorbar(img, ax=ax)
+    plt.figure()
+    librosa.display.specshow(spec.T)
+    plt.colorbar()
+    plt.title(trans_str)
 
 # Index conversion
 letter2index = { l : i for i, l in enumerate(LETTER_LIST)}
