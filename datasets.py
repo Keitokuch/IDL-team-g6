@@ -2,17 +2,20 @@ import torch
 import torch.nn.utils.rnn as rnn
 import torch.nn.functional as F
 import numpy as np
+from data_augment import *
 
 class KnnwAudioDataset(torch.utils.data.Dataset):
     def __init__(self, 
                  audio_data,
                  subtitle_df,
+                 data_aug=False,
                  total_frames=1370582, 
                  total_duration=6396010):
         self.duration_per_frame = total_duration / total_frames
         self.audio = audio_data
         self.subtitle_df = subtitle_df
         self.length = len(self.subtitle_df)
+        self.data_aug = data_aug
         
     def __len__(self):
         return self.length
@@ -28,6 +31,9 @@ class KnnwAudioDataset(torch.utils.data.Dataset):
         
         subtitle_item = self.subtitle_df.iloc[i]['Transcript Indices']
         subtitle_item = torch.tensor(subtitle_item)
+
+        if self.data_aug:
+            audio_item = specaugment(audio_item)
         
         return audio_item, subtitle_item
         
