@@ -50,7 +50,8 @@ class KnnwAudioDataset(torch.utils.data.Dataset):
         
         return range(int(start_index), int(stop_index))
 
-    def collate(self, data):
+    @classmethod
+    def collate(cls, data):
         if len(data[0]) == 2:
             X, Y = zip(*data)
             y_lens = torch.tensor(list(map(len, Y)))
@@ -105,7 +106,8 @@ class KnnwSpeakerDataset(torch.utils.data.Dataset):
         
         return range(int(start_index), int(stop_index))
 
-    def collate(self, data):
+    @classmethod
+    def collate(cls, data):
         if len(data[0]) == 2:
             X, Y = zip(*data)
             X = [torch.tensor(x).float() for x, y in data]
