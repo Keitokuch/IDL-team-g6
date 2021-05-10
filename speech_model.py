@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.utils.rnn as rnn
+import torch.nn.functional as F
 from constant import LETTER_LIST
 
 from __main__ import device
