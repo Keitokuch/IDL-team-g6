@@ -55,6 +55,8 @@ class Session():
         if lr:
             self.set_lr(lr)
         use_sched = True if self.lr_sched is not None and not disable_sched else False
+        if use_sched:
+            self.lr_sched = self.sched_factory(self)
         end_epoch = self.epoch + num_epochs
         for i in range(num_epochs):
             self.epoch += 1
@@ -77,7 +79,7 @@ class Session():
         self.model = self.model_factory()
         self.optim = self.optim_factory(self.model)
         if self.sched_factory:
-            self.lr_sched = self.sched_factory(self.optim)
+            self.lr_sched = self.sched_factory(self)
         else:
             self.lr_sched = None
         self.scaler = torch.cuda.amp.GradScaler(enabled=self.use_amp)
@@ -130,7 +132,7 @@ class Session():
 
     def set_lr_sched(self, sched_factory):
         self.sched_factory = sched_factory
-        self.lr_sched = sched_factory(self.optim)
+        self.lr_sched = sched_factory(self)
         return self
 
     def set_lr(self, lr):
