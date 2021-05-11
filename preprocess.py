@@ -1,4 +1,5 @@
 import re
+import constant
 from num2words import num2words
 from utils import transcript_to_index
 
@@ -36,7 +37,7 @@ def preprocess_line(line):
     return line
 
 
-def preprocess(sub_df, remove_music=False):
+def preprocess(sub_df, remove_music=False, min_label_cnt=constant.MIN_LABEL_CNT):
     #  Process text
     sub_df['Processed Text'] = sub_df['Text'].apply(preprocess_line)
     if remove_music:
@@ -45,6 +46,15 @@ def preprocess(sub_df, remove_music=False):
     processed_df = sub_df[(sub_df['Processed Text'] != '') & (sub_df['Speaker Label'] != 'None')].copy()
     print("Number of lines:", len(sub_df), '->', len(processed_df))
     processed_df['Transcript Indices'] = processed_df['Processed Text'].apply(transcript_to_index)
+    processed_df = processed_df.reset_index()
+    valid_labels = processed_df.groupby("Speaker Label").index.count() > min_label_cnt
+    # Keep only labels that appear more than 5 times
+    mask = valid_labels[processed_df["Speaker Label"]].reset_index()
+    processed_df["Speaker Label"].where(mask['index'], 'None', inplace=True)
+    constant.set_min_label_count(min_label_cnt)
+    label_set = set(processed_df['Speaker Label'])
+    assert len(constant.LABEL_LIST) - len(label_set) <= 1
+    print("Number of labels:", len(label_set))
     return processed_df
 
 

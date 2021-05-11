@@ -3,7 +3,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import librosa
 import librosa.display
-from constant import LETTER_LIST, LABEL_LIST
+import constant
 
 
 def plot_attention(attention):
@@ -18,11 +18,11 @@ def plot_spectrogram(spec, trans_str=""):
     plt.title(trans_str)
 
 # Index conversion
-letter2index = { l : i for i, l in enumerate(LETTER_LIST)}
-index2letter = { i : l for i, l in enumerate(LETTER_LIST)}
+letter2index = { l : i for i, l in enumerate(constant.LETTER_LIST)}
+index2letter = { i : l for i, l in enumerate(constant.LETTER_LIST)}
 
-label2index = { l : i for i, l in enumerate(LABEL_LIST)}
-index2label = { i : l for i, l in enumerate(LABEL_LIST)}
+label2index = { l : i for i, l in enumerate(constant.LABEL_LIST)}
+index2label = { i : l for i, l in enumerate(constant.LABEL_LIST)}
 
 
 # Decode Utilities
