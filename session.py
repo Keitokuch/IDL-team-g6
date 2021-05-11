@@ -63,6 +63,7 @@ class Session():
             if use_sched:
                 self.lr_sched.step(self.epoch, score, loss)
             self.save_checkpoint()
+            self.save_checkpoint("last")
 
     def save(self, name=None):
         name = name or self.name
@@ -103,8 +104,6 @@ class Session():
             ckpt['lr_sched'] = self.lr_sched.state_dict()
         ckpt.update(self.get_checkpoint())
         torch.save(ckpt, ckpt_path)
-        last = os.path.join(name, "last")
-        torch.save(ckpt, last)
 
     def load_checkpoint(self, cp_name):
         cp_name = str(cp_name)
