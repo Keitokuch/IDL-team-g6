@@ -5,7 +5,7 @@ import numpy as np
 from utils import *
 from data_augment import *
 
-class KnnwAudioDataset(torch.utils.data.Dataset):
+class KnnwSpeechDataset(torch.utils.data.Dataset):
     def __init__(self, 
                  audio_data,
                  subtitle_df,
