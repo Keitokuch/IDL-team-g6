@@ -5,7 +5,7 @@ Repository of the final project of Team 7 for 11785 Introduction to Deep Learnin
 In the project, the team attempted to build an end-to-end speaker labeled transcript generation model. The training data for the project is obtained from the Anime Movie Kimi no Na wa.
 
 ## Data: 
-1. log spectrogram of KNNW original audio soundtrack
+1. Log spectrogram of KNNW original audio soundtrack
 2. Labeled original transcript
 
 ## Model:
