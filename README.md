@@ -2,14 +2,14 @@
 
 Repository of the final project of Team 7 for 11785 Introduction to Deep Learning S21
 
-The team builds an end-to-end speaker labeled transcript generation model applied on the Anime Movie Kimi no Na wa.
+In the project, the team attempted to build an end-to-end speaker labeled transcript generation model. The training data for the project is obtained from the Anime Movie Kimi no Na wa.
 
 ## Data: 
 1. log spectrogram of KNNW original audio soundtrack
 2. Labeled original transcript
 
 ## Model:
-1. Modified LAS model for speech recognition
+1. Modified LAS model for speech recognition (with transfer learning)
 2. CNN-LSTM model for speaker identification 
 
 ## Performance:
