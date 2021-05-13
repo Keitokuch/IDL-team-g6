@@ -165,17 +165,21 @@ class LASSession(Session):
         torch.cuda.empty_cache()
         return avg_dist, avg_loss
 
-    def plot_history(self):
+    def plot_history(self, fname=None, format=None):
         loss = [self.train_loss_history.get(e, None) for e in range(1, self.epoch)]
         dist = [self.val_dist_history.get(e, None) for e in range(1, self.epoch)]
         plt.plot(loss, label='loss')
         plt.plot(dist, label='dist')
+        plt.title("Transcript Generation Training History")
         plt.xlabel("Epoch")
         plt.ylabel("Cross-Entropy Loss")
         plt.legend()
-        plt.show()
+        if fname:
+            plt.savefig(fname, format=format, bbox_inches='tight')
+        else:
+            plt.show()
 
-    def plot_loss(self):
+    def plot_loss(self, fname=None, format=None):
         train = [self.train_loss_history.get(e, None) for e in range(1, self.epoch)]
         test = [self.val_loss_history.get(e, None) for e in range(1, self.epoch)]
         plt.plot(train, label='train')
@@ -184,9 +188,12 @@ class LASSession(Session):
         plt.xlabel("Epoch")
         plt.ylabel("Cross-Entropy Loss")
         plt.legend()
-        plt.show()
+        if fname:
+            plt.savefig(fname, format=format, bbox_inches='tight')
+        else:
+            plt.show()
     
-    def plot_dist(self):
+    def plot_dist(self, fname=None, format=None):
         train = [self.train_dist_history.get(e, None) for e in range(1, self.epoch)]
         test = [self.val_dist_history.get(e, None) for e in range(1, self.epoch)]
         plt.plot(train, label='train')
@@ -195,7 +202,10 @@ class LASSession(Session):
         plt.xlabel('Epoch')
         plt.ylabel('Levenshtein Distance')
         plt.legend()
-        plt.show()
+        if fname:
+            plt.savefig(fname, format=format, bbox_inches='tight')
+        else:
+            plt.show()
 
 
 class SpeakerRecSession(Session):
@@ -287,7 +297,7 @@ class SpeakerRecSession(Session):
         plt.ylabel("Cross-Entropy Loss")
         plt.legend()
         if fname:
-            plt.savefig(fname, format=format)
+            plt.savefig(fname, format=format, bbox_inches='tight')
         else:
             plt.show()
     
@@ -301,6 +311,6 @@ class SpeakerRecSession(Session):
         plt.title("Speaker Identification Accuracy")
         plt.legend()
         if fname:
-            plt.savefig(fname, format=format)
+            plt.savefig(fname, format=format, bbox_inches='tight')
         else:
             plt.show()
